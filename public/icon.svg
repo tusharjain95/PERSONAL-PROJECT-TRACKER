@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4338ca"/>
+      <stop offset="50%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1e1b4b" flood-opacity="0.35"/>
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#10b981" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Container -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Inner Border Glow -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.2"/>
+
+  <!-- Main Graphic: Kanban Bars + Progress Trajectory Arrow -->
+  <g filter="url(#dropShadow)">
+    <!-- Column 1: Backlog / In Progress -->
+    <rect x="108" y="240" width="64" height="152" rx="18" fill="url(#barGrad)" fill-opacity="0.75"/>
+    
+    <!-- Column 2: Active / Building -->
+    <rect x="196" y="180" width="64" height="212" rx="18" fill="url(#barGrad)" fill-opacity="0.9"/>
+    
+    <!-- Column 3: Completed / Done -->
+    <rect x="284" y="120" width="64" height="272" rx="18" fill="url(#barGrad)"/>
+
+    <!-- Dynamic Checkmark / Milestone Star in Column 3 -->
+    <circle cx="316" cy="162" r="14" fill="#4f46e5"/>
+    <path d="M310 162 L314 166 L322 158" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Upward Trend Trajectory Path with Arrow & Dot -->
+    <path d="M140 260 Q 230 190, 360 110" fill="none" stroke="url(#accentGrad)" stroke-width="12" stroke-linecap="round" filter="url(#glow)"/>
+    
+    <!-- Leading Accent Node -->
+    <circle cx="372" cy="102" r="22" fill="url(#accentGrad)" filter="url(#glow)"/>
+    <circle cx="372" cy="102" r="10" fill="#ffffff"/>
+  </g>
+</svg>

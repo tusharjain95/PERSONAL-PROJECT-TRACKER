@@ -1,5 +1,5 @@
 {
-  "name": "Personal Project Tracker",
+  "name": "Projtrack",
   "description": "A personal project management and Kanban tracker with multi-device real-time cloud synchronization, detailed milestone drill-downs, task progress tracking, and Vercel hosting support.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

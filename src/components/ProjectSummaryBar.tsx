@@ -9,7 +9,8 @@ import {
   Target, 
   AlertCircle,
   TrendingUp,
-  FolderDot
+  FolderDot,
+  Trash2
 } from 'lucide-react';
 import { Project, Task } from '../types';
 import { calculateProjectStats, formatDate } from '../utils/storage';
@@ -19,6 +20,7 @@ interface ProjectSummaryBarProps {
   tasks: Task[];
   onOpenNewTask: () => void;
   onEditProject?: () => void;
+  onDeleteProject?: () => void;
 }
 
 export const ProjectSummaryBar: React.FC<ProjectSummaryBarProps> = ({
@@ -26,6 +28,7 @@ export const ProjectSummaryBar: React.FC<ProjectSummaryBarProps> = ({
   tasks,
   onOpenNewTask,
   onEditProject,
+  onDeleteProject,
 }) => {
   if (!project) return null;
 
@@ -59,7 +62,19 @@ export const ProjectSummaryBar: React.FC<ProjectSummaryBarProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-shrink-0">
+          {onDeleteProject && (
+            <button
+              id="delete-current-project-btn"
+              onClick={onDeleteProject}
+              className="px-3 py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-red-700 hover:bg-red-50/80 border border-slate-200 hover:border-red-200 rounded-xl transition-all flex items-center gap-1.5 shadow-2xs"
+              title="Delete this project and all its associated tasks"
+            >
+              <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-red-600" />
+              <span className="hidden xs:inline">Delete Project</span>
+            </button>
+          )}
+
           <button
             id="quick-add-task-btn"
             onClick={onOpenNewTask}

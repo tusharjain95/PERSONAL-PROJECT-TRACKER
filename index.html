@@ -2,15 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-    <meta name="description" content="An application built with Google AI Studio." />
-    <meta property="og:title" content="My Google AI Studio App" />
-    <meta property="og:description" content="An application built with Google AI Studio." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Projtrack</title>
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Projtrack - Personal Project Tracker" />
+    <meta name="description" content="Personal project management and Kanban tracker with multi-device cloud synchronization and milestone tracking." />
+    
+    <!-- PWA & Mobile Icons -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- PWA & Apple Meta Tags -->
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Projtrack" />
+    <meta name="application-name" content="Projtrack" />
+    <meta name="msapplication-TileColor" content="#4f46e5" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Projtrack - Personal Project Tracker" />
+    <meta property="og:description" content="Personal project management and Kanban tracker with multi-device cloud synchronization and milestone tracking." />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icon.svg" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Projtrack" />
+    <meta name="twitter:description" content="Personal project management and Kanban tracker with multi-device cloud synchronization." />
+    <meta name="twitter:image" content="/icon.svg" />
   </head>
-  <body>
+  <body class="bg-slate-50 text-slate-900 antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

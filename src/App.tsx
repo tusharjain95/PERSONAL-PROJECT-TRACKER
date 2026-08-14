@@ -15,6 +15,8 @@ import { NewTaskModal } from './components/NewTaskModal';
 import { NewProjectModal } from './components/NewProjectModal';
 import { SyncSettingsModal } from './components/SyncSettingsModal';
 import { VercelDeployGuideModal } from './components/VercelDeployGuideModal';
+import { InstallAppModal } from './components/InstallAppModal';
+import { DeleteProjectModal } from './components/DeleteProjectModal';
 import { Task, Project, ColumnStatus, Priority, SyncState, WorkspaceData } from './types';
 import { 
   getStoredProjects, 
@@ -37,12 +39,16 @@ export default function App() {
   const [lastSyncedAt, setLastSyncedAt] = useState<string | undefined>(syncManager.getSettings().lastSyncedAt);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [isDeployGuideOpen, setIsDeployGuideOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
 
   // UI State
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [newTaskInitialStatus, setNewTaskInitialStatus] = useState<ColumnStatus>('backlog');
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
+  const [isDeleteProjectOpen, setIsDeleteProjectOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'kanban' | 'milestones_matrix'>('kanban');
 
   // Filters
@@ -50,6 +56,44 @@ export default function App() {
   const [selectedPriority, setSelectedPriority] = useState<Priority | 'all'>('all');
   const [selectedTag, setSelectedTag] = useState<string | 'all'>('all');
   const [pendingOnly, setPendingOnly] = useState(false);
+
+  // PWA Install prompt listener
+  useEffect(() => {
+    const handleBeforeInstall = (e: any) => {
+      e.preventDefault();
+      setDeferredInstallPrompt(e);
+    };
+
+    const handleAppInstalled = () => {
+      setIsAppInstalled(true);
+      setDeferredInstallPrompt(null);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsAppInstalled(true);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const handleTriggerInstall = async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choiceResult = await deferredInstallPrompt.userChoice;
+      if (choiceResult.outcome === 'accepted') {
+        setIsAppInstalled(true);
+      }
+      setDeferredInstallPrompt(null);
+    } else {
+      setIsInstallModalOpen(true);
+    }
+  };
 
   // Initialize data and sync manager on mount
   useEffect(() => {
@@ -214,6 +258,47 @@ export default function App() {
     syncManager.pushChanges(updatedProjects, tasks, newProject.id);
   };
 
+  const handleDeleteProject = (projectIdToDelete: string) => {
+    const remainingProjects = projects.filter((p) => p.id !== projectIdToDelete);
+    const remainingTasks = tasks.filter((t) => t.projectId !== projectIdToDelete);
+
+    let nextActiveId = '';
+
+    if (remainingProjects.length > 0) {
+      nextActiveId = remainingProjects[0].id;
+      setProjects(remainingProjects);
+      setTasks(remainingTasks);
+      setActiveProjId(nextActiveId);
+      saveProjects(remainingProjects);
+      saveTasks(remainingTasks);
+      setActiveProjectId(nextActiveId);
+      syncManager.pushChanges(remainingProjects, remainingTasks, nextActiveId);
+    } else {
+      // Create a clean starter project if user deletes their only project
+      const fallbackProject: Project = {
+        id: `proj_${Date.now()}`,
+        name: 'My Workspace',
+        description: 'Default project workspace',
+        color: '#4f46e5',
+        icon: 'folder',
+        category: 'General',
+        createdAt: new Date().toISOString(),
+      };
+      nextActiveId = fallbackProject.id;
+      const newProjects = [fallbackProject];
+      setProjects(newProjects);
+      setTasks(remainingTasks);
+      setActiveProjId(nextActiveId);
+      saveProjects(newProjects);
+      saveTasks(remainingTasks);
+      setActiveProjectId(nextActiveId);
+      syncManager.pushChanges(newProjects, remainingTasks, nextActiveId);
+    }
+
+    setSelectedTask(null);
+    setIsDeleteProjectOpen(false);
+  };
+
   const handleResetData = () => {
     if (window.confirm('Reset all projects and tasks to the sample demo data? Any custom tasks will be replaced.')) {
       const { projects: p, tasks: t } = resetToDemoData();
@@ -264,6 +349,8 @@ export default function App() {
         syncState={syncState}
         onOpenSyncSettings={() => setIsSyncModalOpen(true)}
         onOpenDeployGuide={() => setIsDeployGuideOpen(true)}
+        onOpenInstallApp={handleTriggerInstall}
+        isInstallable={Boolean(deferredInstallPrompt)}
       />
 
       {/* Main Container */}
@@ -276,6 +363,7 @@ export default function App() {
             setNewTaskInitialStatus('backlog');
             setIsNewTaskOpen(true);
           }}
+          onDeleteProject={() => setIsDeleteProjectOpen(true)}
         />
 
         {/* Filter, Search & View Controls */}
@@ -393,6 +481,33 @@ export default function App() {
             isOpen={isDeployGuideOpen}
             onClose={() => setIsDeployGuideOpen(false)}
             syncKey={syncManager.getSettings().syncKey}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* PWA / Web App Installation Modal */}
+      <AnimatePresence>
+        {isInstallModalOpen && (
+          <InstallAppModal
+            isOpen={isInstallModalOpen}
+            onClose={() => setIsInstallModalOpen(false)}
+            onInstallClick={handleTriggerInstall}
+            isInstallable={Boolean(deferredInstallPrompt)}
+            isInstalled={isAppInstalled}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Delete Project Confirmation Modal */}
+      <AnimatePresence>
+        {isDeleteProjectOpen && (
+          <DeleteProjectModal
+            isOpen={isDeleteProjectOpen}
+            onClose={() => setIsDeleteProjectOpen(false)}
+            project={activeProject}
+            tasks={tasks}
+            onConfirmDelete={handleDeleteProject}
+            isOnlyProject={projects.length <= 1}
           />
         )}
       </AnimatePresence>

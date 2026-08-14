@@ -9,7 +9,8 @@ import {
   FolderPlus,
   Cloud,
   Globe,
-  Radio
+  Radio,
+  Download
 } from 'lucide-react';
 import { Project, SyncState } from '../types';
 
@@ -23,6 +24,8 @@ interface NavbarProps {
   syncState: SyncState;
   onOpenSyncSettings: () => void;
   onOpenDeployGuide: () => void;
+  onOpenInstallApp: () => void;
+  isInstallable?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -35,6 +38,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   syncState,
   onOpenSyncSettings,
   onOpenDeployGuide,
+  onOpenInstallApp,
+  isInstallable,
 }) => {
   const activeProject = projects.find((p) => p.id === activeProjectId) || projects[0];
 
@@ -43,16 +48,18 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* Brand and Project Picker */}
         <div className="flex items-center gap-3 sm:gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-2xs">
-              <Layers className="w-5 h-5 text-indigo-400" />
-            </div>
+          <div className="flex items-center gap-2.5 select-none">
+            <img
+              src="/icon.svg"
+              alt="Projtrack Logo"
+              className="w-9 h-9 rounded-xl shadow-xs object-contain border border-slate-200/80 shrink-0"
+            />
             <div>
-              <span className="text-sm font-black tracking-tight text-slate-900 block leading-tight">
-                PROJ<span className="text-indigo-600">TRACK</span>
+              <span className="text-base font-black tracking-tight text-slate-900 block leading-tight">
+                Projtrack
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-600 block">
-                Personal Tracker
+              <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-600 block">
+                Workspaces & Sync
               </span>
             </div>
           </div>
@@ -98,7 +105,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right side controls */}
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
+          {/* Install Web App Button */}
+          <button
+            id="navbar-install-app-btn"
+            onClick={onOpenInstallApp}
+            className="px-2.5 py-1.5 rounded-xl text-xs font-bold border border-indigo-200 bg-indigo-50/70 text-indigo-700 hover:bg-indigo-100/90 transition-all flex items-center gap-1.5 shadow-2xs"
+            title="Install Projtrack as a Web App on your device"
+          >
+            <Download className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="hidden sm:inline">Install App</span>
+            <span className="sm:hidden">App</span>
+          </button>
+
           {/* Cloud Sync Status Button */}
           <button
             id="navbar-cloud-sync-btn"
@@ -134,7 +153,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Step-by-step instructions to deploy on Vercel"
           >
             <Globe className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Deploy to Vercel</span>
+            <span>Deploy</span>
           </button>
 
           <button
